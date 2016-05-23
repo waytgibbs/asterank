@@ -7,15 +7,18 @@
   opts.static_prefix = opts.static_prefix || '/static';
   opts.default_camera_position = opts.camera_position || [0, 155, 32];
   opts.camera_fly_around = typeof opts.camera_fly_around === 'undefined' ? true : opts.camera_fly_around;
-  opts.jed_delta = opts.jed_delta || 0.25;
+  opts.jed_delta = opts.jed_delta || 0.15;
   opts.custom_object_fn = opts.custom_object_fn || null;
   opts.object_texture_path = opts.object_texture_path || opts.static_prefix + "/img/cloud4.png";
   opts.not_supported_callback = opts.not_supported_callback || function() {};
   opts.sun_scale = opts.sun_scale || 50;
   opts.show_dat_gui = opts.show_dat_gui || false;
   opts.top_object_color = opts.top_object_color ?
-      new THREE.Color(opts.top_object_color) : new THREE.Color(0xDBDB70);
-  opts.milky_way_visible = opts.milky_way_visible || true;
+      new THREE.Color(opts.top_object_color) : new THREE.Color(0xcccccc);
+  // WWG: was 0xDBDB70
+  opts.milky_way_visible = opts.milky_way_visible || false;
+  // WWG: Toggle between display of NEOWISE and Myhrvold data
+  opts.Myhrvold_data = true;
 
   // requestAnimFrame polyfill
   window.requestAnimFrame = (function(){
@@ -31,9 +34,9 @@
 
   /** Constants **/
   var WEB_GL_ENABLED = true
-    , MAX_NUM_ORBITS = 4000
+    , MAX_NUM_ORBITS = 2200
     , PIXELS_PER_AU = 50
-    , NUM_BIG_PARTICLES = 25;   // show this many asteroids with orbits
+    , NUM_BIG_PARTICLES = 2200   // show this many asteroids with orbits
 
   /** Other variables **/
   var stats, scene, renderer, composer
@@ -73,7 +76,7 @@
   // Initialization
   init();
   if (opts.show_dat_gui) {
-    initGUI();
+//    initGUI();
   }
 
   $('#btn-toggle-movement').on('click', function() {
@@ -85,7 +88,8 @@
     $(this).css('font-weight', 'bold');
   });
 
-  // Soecial cases.
+  // Special cases.
+  featured_davidbowie = true;
   if (featured_davidbowie) {
     if (typeof mixpanel !== 'undefined') mixpanel.track('davidbowie special');
     setTimeout(function() {
@@ -114,7 +118,7 @@
       this['Speed'] = opts.jed_delta;
       this['Planet orbits'] = planet_orbits_visible;
       this['Milky Way'] = opts.milky_way_visible;
-      this['Display date'] = '12/26/2012';
+      this['Display date'] = '05/17/2016';
     };
 
     window.onload = function() {
@@ -180,8 +184,8 @@
     $('#loading-text').html('renderer');
     if (isWebGLSupported()){
       renderer = new THREE.WebGLRenderer({
-        antialias		: true	// to get smoother output
-        //preserveDrawingBuffer	: true	// to allow screenshot
+        antialias		: true,	// to get smoother output
+        preserveDrawingBuffer	: true	// to allow screenshot
       });
       renderer.setClearColor(0x000000, 1);
       using_webgl = true;
@@ -226,13 +230,19 @@
     window.cc = cameraControls;
 
     // This is stupid but it's how I set up the initial rotation
+   cameraControls.forceRotate(
+       new THREE.Vector3(0.09133858267716535, 0.4658716047427351, 0.1826620371691377),
+       new THREE.Vector3(-0.12932885444884135, 0.35337196181704117,  0.023557202790282953));
+   cameraControls.forceRotate(
+       new THREE.Vector3(0.5557858773636077, 0.7288978222072244, 0.17927802044881952),
+       new THREE.Vector3(-0.0656536826099882, 0.5746939531732201, 0.7470641189675084));
+/*     cameraControls.forceRotate(
+        new THREE.Vector3(0.1,0.5,0.2),
+        new THREE.Vector3(-0.1,0.4,0));
     cameraControls.forceRotate(
-        new THREE.Vector3(0.09133858267716535, 0.4658716047427351, 0.1826620371691377),
-        new THREE.Vector3(-0.12932885444884135, 0.35337196181704117,  0.023557202790282953));
-    cameraControls.forceRotate(
-        new THREE.Vector3(0.5557858773636077, 0.7288978222072244, 0.17927802044881952),
-        new THREE.Vector3(-0.0656536826099882, 0.5746939531732201, 0.7470641189675084));
-
+        new THREE.Vector3(0.6,0.7,0.2),
+        new THREE.Vector3(-0.1,0.6,0.7));
+ */
 
     // Rendering solar system
 
@@ -258,25 +268,25 @@
     $('#loading-text').html('planets');
     var mercury = new Orbit3D(Ephemeris.mercury,
         {
-          color: 0x913CEE, width: 1, jed: jed, object_size: 1.7,
+          color: 0xEE6622, width: 1, jed: jed, object_size: 2.5,
           texture_path: opts.static_prefix + '/img/texture-mercury.jpg',
-          display_color: new THREE.Color(0x913CEE),
+          display_color: new THREE.Color(0xEE6622),
           particle_geometry: particle_system_geometry,
           name: 'Mercury'
-        });
+        });   // WWG: color was #913CEE
     scene.add(mercury.getEllipse());
     var venus = new Orbit3D(Ephemeris.venus,
         {
-          color: 0xFF7733, width: 1, jed: jed, object_size: 1.7,
+          color: 0x00FF22, width: 1, jed: jed, object_size: 2.5,
           texture_path: opts.static_prefix + '/img/texture-venus.jpg',
-          display_color: new THREE.Color(0xFF7733),
+          display_color: new THREE.Color(0x00FF22),
           particle_geometry: particle_system_geometry,
           name: 'Venus'
-        });
+        });   // WWG: color was #FF7733
     scene.add(venus.getEllipse());
     var earth = new Orbit3D(Ephemeris.earth,
         {
-          color: 0x009ACD, width: 1, jed: jed, object_size: 1.7,
+          color: 0x009ACD, width: 1, jed: jed, object_size: 2.5,
           texture_path: opts.static_prefix + '/img/texture-earth.jpg',
           display_color: new THREE.Color(0x009ACD),
           particle_geometry: particle_system_geometry,
@@ -289,7 +299,7 @@
     };
     var mars = new Orbit3D(Ephemeris.mars,
         {
-          color: 0xA63A3A, width: 1, jed: jed, object_size: 1.7,
+          color: 0xA63A3A, width: 1, jed: jed, object_size: 2.5,
           texture_path: opts.static_prefix + '/img/texture-mars.jpg',
           display_color: new THREE.Color(0xA63A3A),
           particle_geometry: particle_system_geometry,
@@ -298,7 +308,7 @@
     scene.add(mars.getEllipse());
     var jupiter = new Orbit3D(Ephemeris.jupiter,
         {
-          color: 0xFF7F50, width: 1, jed: jed, object_size: 1.7,
+          color: 0xFF7F50, width: 1, jed: jed, object_size: 2.5,
           texture_path: opts.static_prefix + '/img/texture-jupiter.jpg',
           display_color: new THREE.Color(0xFF7F50),
           particle_geometry: particle_system_geometry,
@@ -307,15 +317,15 @@
     scene.add(jupiter.getEllipse());
 
     planets = [mercury, venus, earth, mars, jupiter];
-    if (featured_davidbowie) {
+/*     if (featured_davidbowie) {
       // Special: davidbowie
       var asteroid_davidbowie = new Orbit3D(Ephemeris.asteroid_davidbowie, {
-        color: 0xffffff,
+        color: 0x0F0FFF,
         width: 1,
         jed: jed,
-        object_size: 1.7,
+        object_size: 10.0,
         texture_path: opts.static_prefix + '/img/cloud4.png',   // not using loadTexture, no support for offline mode...
-        display_color: new THREE.Color(0xffffff),
+        display_color: new THREE.Color(0x0F0FFF),
         particle_geometry: particle_system_geometry,
         name: '342843 Davidbowie'
       });
@@ -326,11 +336,12 @@
       };
       planets.push(asteroid_davidbowie);
     }
-
+ */
     // Skybox
     var geometry = new THREE.SphereGeometry(3000, 60, 40);
     var uniforms = {
-      texture: { type: 't', value: loadTexture(opts.static_prefix + '/img/eso_dark.jpg') }
+    texture: { type: 't', value: loadTexture(opts.static_prefix + '/img/eso_dark.jpg') }
+    //  texture: { type: 't', value: loadTexture(opts.static_prefix + '/img/eso_black.jpg') }
     };
 
     var material = new THREE.ShaderMaterial( {
@@ -348,7 +359,13 @@
     scene.add(skyBox);
     window.skyBox = skyBox;
 
-    $container.on('mousedown mousewheel', function() {
+    $container.on('mousedown', function() {
+      opts.camera_fly_around = false;
+    });
+    $container.on('mousewheel', function() {
+      opts.camera_fly_around = false;
+    });
+    $container.on('keydown', function() {
       opts.camera_fly_around = false;
     });
 
@@ -547,20 +564,84 @@
     particle_system_shader_material.transparent = true;
     particle_system_shader_material.blending = THREE.AdditiveBlending;
 
+    //WWG: Added vars for asteroid coloring according to SD/D or NW/BS
+    var roidColor, roidDiameter, roidDiameterSigma, SDoverD, NWdiameter, BootstrapDelta, addRed, newRoidColor;
+    var MAX_DIAMETER_SIGMA = 1.3
+      , THRESHOLD_DIAMETER_SIGMA = 0.39
+      , MAX_DELTA = 1.0
+      , MIN_DELTA = -0.5
+      , MAX_DELTA_COLOR = 0x0033ff
+      , MIN_DELTA_COLOR = 0x55aaff
+      , MAX_SIGMA_COLOR = 0xff0000
+      , MIN_SIGMA_COLOR = 0xffaa55;
+
     for (var i = 0; i < added_objects.length; i++) {
-      // TODO(ian): Make this generic.
-      var is_featured_object = added_objects[i].name === '342843 Davidbowie';
+      var is_featured_object = added_objects[i].name === 'Not a real object';
       if (is_featured_object) {
         attributes.size.value[i] = 40;
         attributes.is_planet.value[i] = 1.0;
+        attributes.value_color.value[i] = added_objects[i].opts.display_color;
       } else if (i < planets.length) {
-        attributes.size.value[i] = 75;
+        attributes.size.value[i] = 200;
         attributes.is_planet.value[i] = 1.0;
+        attributes.value_color.value[i] = added_objects[i].opts.display_color;
       } else {
         attributes.size.value[i] = added_objects[i].opts.object_size;
         attributes.is_planet.value[i] = 0.0;
-      }
+        roidColor = added_objects[i].opts.display_color;
+        newRoidColor = roidColor;
 
+/*      console.log("roidColor", roidColor);
+        console.log("diameter", added_objects[i].eph.diameter);
+        console.log("diameter_sigma", added_objects[i].eph.diameter_sigma);
+ */
+        if (!opts.Myhrvold_data) {
+          console.log("Myhrvold_data is false");
+        }
+
+        NWdiameter = roidDiameter;
+        if (opts.Myhrvold_data) {
+          roidDiameter = Math.abs(added_objects[i].eph.diameter);
+          roidDiameterSigma = Math.abs(added_objects[i].eph.diameter_sigma);
+          NWdiameter = Math.abs(added_objects[i].eph.M1);
+        } else {
+          roidDiameter = Math.abs(added_objects[i].eph.M1);
+          roidDiameterSigma = Math.abs(added_objects[i].eph.M2);
+        }
+
+        SDoverD = (roidDiameterSigma/roidDiameter);
+        BootstrapDelta = (roidDiameter/NWdiameter) - 1;
+
+//        console.log("SDoverD", SDoverD);
+
+        //WWG: Logic to color asteroids either white (for SDoverD <= 0.1), shades of red (for 0.1 < SDoverD <= 1), or red
+/*         if (SDoverD > 0.1) {
+          newRoidColor = roidColor;
+          // Gradient of colors for SDs up to NEOWISE max SDratio, then peg at end of color scale
+          if (SDoverD > THRESHOLD_DIAMETER_SIGMA) {
+            newRoidColor = new THREE.Color(MAX_SIGMA_COLOR);
+          } else {
+            newRoidColor = toColor(getColorFromPercent((SDoverD/THRESHOLD_DIAMETER_SIGMA), MAX_SIGMA_COLOR, MIN_SIGMA_COLOR));
+          }
+ */
+        if (BootstrapDelta <= -0.1) {
+          // Gradient of colors for ratios down to -0.5 (NW >= 50% too small), then peg at end of color scale
+          if (BootstrapDelta <= MIN_DELTA) {
+            newRoidColor = new THREE.Color(MIN_DELTA_COLOR);
+          } else {
+            newRoidColor = toColor(getColorFromPercent((BootstrapDelta/MIN_DELTA), MAX_DELTA_COLOR, MIN_DELTA_COLOR));
+          }
+        } else if (BootstrapDelta >= 0.1) {
+          // Gradient of colors for ratios up to 1.0 (NW <= 50% too small), then peg at end of color scale
+          if (BootstrapDelta >= MAX_DELTA) {
+            newRoidColor = new THREE.Color(MAX_SIGMA_COLOR);
+          } else {
+            newRoidColor = toColor(getColorFromPercent((BootstrapDelta/MAX_DELTA), MAX_SIGMA_COLOR, MIN_SIGMA_COLOR));
+          }
+        }
+
+        attributes.value_color.value[i] = newRoidColor;
+      }
       attributes.a.value[i] = added_objects[i].eph.a;
       attributes.e.value[i] = added_objects[i].eph.e;
       attributes.i.value[i] = added_objects[i].eph.i;
@@ -571,7 +652,9 @@
         || (added_objects[i].eph.w + added_objects[i].eph.om);
       attributes.P.value[i] = added_objects[i].eph.P || -1.0;
       attributes.epoch.value[i] = added_objects[i].eph.epoch;
-      attributes.value_color.value[i] = added_objects[i].opts.display_color;
+      //WWG: The line below is where asteroid color can be set individually
+//      attributes.value_color.value[i] = added_objects[i].opts.display_color;
+//      attributes.value_color.value[i] = added_objects[i].opts.display_color //THREE.Color(0xff6f6f);
       attributes.locked.value[i] = is_featured_object ? 1.0 : 0.0;
     }  // end added_objects loop
 
@@ -585,6 +668,28 @@
 
     // add it to the scene
     scene.add(particleSystem);
+  }
+
+  function getColorFromPercent(value, highColor, lowColor) {
+    var r = highColor >> 16;
+    var g = highColor >> 8 & 0xFF;
+    var b = highColor & 0xFF;
+
+    r += ((lowColor >> 16) - r) * value;
+    g += ((lowColor >> 8 & 0xFF) - g) * value;
+    b += ((lowColor & 0xFF) - b) * value;
+
+    return (r << 16 | g << 8 | b);
+  }
+
+  function toColor(num) {
+    num >>>= 0;
+    var b = num & 0xFF,
+        g = (num & 0xFF00) >>> 8,
+        r = (num & 0xFF0000) >>> 16;
+//    console.log("gotColors", r + "," + g + "," + b);
+
+    return new THREE.Color("rgb(" + r + "," + g + "," + b + ")");
   }
 
   function setAttributeNeedsUpdateFlags() {
@@ -621,6 +726,7 @@
     if (!asteroids_loaded) {
       render();
       requestAnimFrame(animate);
+      //WWG: ADD DUMP SCREEN TO PNG HERE
       return;
     }
 
@@ -762,7 +868,8 @@
       particle_system_geometry.vertices.push(new THREE.Vector3(0,0,0));
     }
 
-    var useBigParticles = !using_webgl;
+// WWG:    var useBigParticles = !using_webgl;
+    var useBigParticles = true;
     var featured_count = 0;
     var featured_html = '';
     for (var i=0; i < n; i++) {
@@ -785,8 +892,9 @@
       else {
         var display_color = i < NUM_BIG_PARTICLES ?
             opts.top_object_color : displayColorForObject(roid);
+//WWG:  below was  color: 0xcccccc,
         orbit = new Orbit3D(roid, {
-          color: 0xcccccc,
+          color: displayColorForObject(roid),
           display_color: display_color,
           width: 2,
           object_size: i < NUM_BIG_PARTICLES ? 50 : 15, //1.5,
@@ -817,10 +925,11 @@
     } // end asteroid results for loop
 
     // handle when view mode is switched - need to clear every row but the sun
-    if (featured_davidbowie) {
+//WWG:    if (featured_davidbowie) {
+    if (true) {
       $('#objects-of-interest tr:gt(2)').remove();
       setTimeout(function() {
-        setLock('342843 Davidbowie');
+//        setLock('342843 Davidbowie');
         $('#sun-selector').css('background-color', 'black');
         $('#earth-selector').css('background-color', 'green');
       }, 0);

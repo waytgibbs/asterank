@@ -1,15 +1,15 @@
 <!doctype html>
 <html>
 	<head>
-		<title>3D Interactive Asteroid Space Visualization - Asterank</title>
+		<title>Asteroid Space Visualization - Asterank by Planetary Resources, Inc.</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     {% assets filter="cssmin", output="gen/packed_full3d.css",
     "css/full3d.css"
     %}
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link href="{{ASSET_URL}}" rel="stylesheet" />
     {% endassets %}
-
     <script>
       window.passthrough_vars = {
         {% if passthrough_vars and passthrough_vars.offline_mode %}
@@ -23,7 +23,8 @@
         {% endif %}
       };
     </script>
-	</head>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  </head>
 <body>
   <noscript>Sorry, this page requires Canvas/WebGL, so you'll need to enable JavaScript.</noscript>
 
@@ -32,29 +33,40 @@
   {% endif %}
 
   {% include "blocks/shaders.html" %}
+    <script>
+      function updateSite(event) {
+        window.location.reload(true);
+      }
+      window.applicationCache.addEventListener('updateready', updateSite, false);
+    </script>
 
+<!--
   <div id="show_sidebar_container" class="sidebar">
     <span id="show_sidebar" style="float:right;cursor:pointer;">+</span>
     <p style="margin-top:0">
       &laquo; <a href="/">Asteroid data view</a>
     </p>
   </div>
+-->
+
+<!--
   <div id="sidebar" class="sidebar">
     <span id="hide_sidebar" style="float:right;cursor:pointer;">-</span>
     <p style="margin-top:0">
       &laquo; <a href="/">Asteroid data view</a>
     </p>
-{% if not offline_mode %}
+
+    {% if not offline_mode %}
     <div class="fb-like" data-href="http://www.asterank.com/3d/" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
     <a style="font-size:10px;" href="https://twitter.com/share" data-url="http://asterank.com/3d/" data-counturl="http://asterank.com/3d/" class="twitter-share-button" data-lang="en">Tweet</a>
-<div>
-    <g:plusone size="small" count="false"></g:plusone>
-</div>
-{% endif %}
+    <div>
+      <g:plusone size="small" count="false"></g:plusone>
+    </div>
+    {% endif %}
 
     <hr/>
-    <div id="objects-of-interest-container" style="text-align:center;display:none;opacity:.7;">
-      <span>Significant objects<br>&amp; estimated value</span>
+    <div id="objects-of-interest-container" style="text-align:center;display:none;opacity:0.7;">
+      <span>Recenter view on:</span>
       <table id="objects-of-interest">
         <tr id="sun-selector" data-full-name="sun" style="background-color:green;">
           <td colspan="2"><a href="#">Sun</a> (default view)</td>
@@ -67,10 +79,11 @@
           <td></td>
         </tr>
       </table>
-
     </div>
   </div>
-	<!-- three.js container -->
+-->
+
+  <!-- three.js container -->
   <div id="container"></div>
 	<!-- info on screen display -->
   <div id="loading">
@@ -98,18 +111,31 @@
       </div>
     </div>
 		<div class="bottom" id="inlineDoc" >
-      <span style="font-size:12px;color:#fff">
-      <strong>Rotate</strong>: left click + drag; <strong>Pan</strong>: right click + drag
-      <br>
-      <strong>Zoom</strong>: scroll/middle click + drag; <strong>Fullscreen</strong>: press f
-      <br>
-      Location of all objects shown is scientifically accurate.</span>
+      <span style="font-size:11px;color:#ffffff"><p>
+      <strong><u>CONTROLS {click or tap to dismiss}</u></strong><br>
+      <strong>Rotate</strong>: left click + drag, or touch + drag<br>
+      <strong>Pan</strong>: right click + drag, or 3-finger drag<br>
+      <strong>Zoom</strong>: scroll wheel, middle click + drag, or pinch<br>
+      <strong>Fullscreen</strong>: press f<br>
+<!--       <strong>Show size uncertainties reported by NEOWISE</strong>: press n<br> -->
+      Orbits of all objects shown is scientifically accurate.<br>
+      Visualization by: W. Wayt Gibbs, <a href="http://intven.com">Intellectual Ventures</a><br>
+      using code by <a href="http://www.ianww.com/">Ian Webster</a> and <a href="http://PlanetaryResources.com/">Planetary Resources</a></p></span>
 		</div>
-	</div>
+      <script>
+        $( "span" ).click(function() {
+          $( this ).fadeOut( 1000, function() {
+          $( this ).remove();
+          });
+        });
+      </script>
+  </div>
+
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <!--
   <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r58/three.min.js"></script>
   -->
+
   {% assets filter="jsmin", output="gen/packed_full3d.js",
   "js/3d/lib/three.js/three.min.js",
   "js/3d/lib/three.js/Detector.js",
@@ -126,6 +152,8 @@
 <script type="text/javascript" src="{{ASSET_URL}}"></script>
 {% endassets %}
 
+
+  <!--
 {% if not offline_mode %}
 <script type="text/javascript">
 if(~document.location.href.indexOf('asterank.com')) {
@@ -145,7 +173,8 @@ if(~document.location.href.indexOf('asterank.com')) {
 else {
   mixpanel = {track: function() {}};
 }</script>
-<div id="fb-root"></div>
+
+  <div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -162,5 +191,6 @@ else {
   })();
 </script>
 {% endif %}
+-->
 </body>
 </html>

@@ -5,7 +5,7 @@
 THREE.TrackballControls = function ( object, domElement ) {
 
 	var _this = this;
-	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5, DATA: 3 };
+	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5 };
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -31,7 +31,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
 
-	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/, 78 /*N*/ ];
+ 	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0 };
+	this.moveVector = new THREE.Vector3( 0, 0, 0 );
+	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
+  this.autoForward = false;
+
+
+	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
 	// internals
 
@@ -295,8 +301,27 @@ THREE.TrackballControls = function ( object, domElement ) {
 			lastPosition.copy( _this.object.position );
 
 		}
-    // console.log(_eye);
+    console.log(_eye);
 	};
+
+ 	this.updateKey = function( delta ) {
+
+		var moveMult = delta * this.movementSpeed;
+		var rotMult = delta * this.rollSpeed;
+
+		this.object.translateX( this.moveVector.x * moveMult );
+		this.object.translateY( this.moveVector.y * moveMult );
+		this.object.translateZ( this.moveVector.z * moveMult );
+
+		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
+		this.object.quaternion.multiply( this.tmpQuaternion );
+
+		// expose the rotation vector for convenience
+		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+
+
+	};
+
 
 	this.reset = function () {
 
@@ -323,7 +348,34 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
-		window.removeEventListener( 'keydown', keydown );
+		switch ( event.keyCode ) {
+
+			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
+
+			case 87: /*W*/ this.moveState.forward = 1; break;
+			case 83: /*S*/ this.moveState.back = 1; break;
+
+			case 65: /*A*/ this.moveState.left = 1; break;
+			case 68: /*D*/ this.moveState.right = 1; break;
+
+			case 82: /*R*/ this.moveState.up = 1; break;
+			case 70: /*F*/ this.moveState.down = 1; break;
+
+			case 38: /*up*/ this.moveState.pitchUp = 1; break;
+			case 40: /*down*/ this.moveState.pitchDown = 1; break;
+
+			case 37: /*left*/ this.moveState.yawLeft = 1; break;
+			case 39: /*right*/ this.moveState.yawRight = 1; break;
+
+			case 81: /*Q*/ this.moveState.rollLeft = 1; break;
+			case 69: /*E*/ this.moveState.rollRight = 1; break;
+
+		}
+
+		this.updateMovementVector();
+		this.updateRotationVector();
+
+ /*   window.removeEventListener( 'keydown', keydown );
 
 		_prevState = _state;
 
@@ -346,12 +398,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 			_state = STATE.PAN;
       console.log("pan");
 
-		} else if ( event.keyCode === _this.keys[ STATE.DATA ] ) {
-
-			  this.Myhrvold_data = false;
-        console.log("toggle data");
-
 		}
+*/
 
 	}
 
@@ -359,11 +407,61 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _this.enabled === false ) return;
 
-		_state = _prevState;
+		switch ( event.keyCode ) {
+
+			case 16: /* shift */ this.movementSpeedMultiplier = 1; break;
+
+			case 87: /*W*/ this.moveState.forward = 0; break;
+			case 83: /*S*/ this.moveState.back = 0; break;
+
+			case 65: /*A*/ this.moveState.left = 0; break;
+			case 68: /*D*/ this.moveState.right = 0; break;
+
+			case 82: /*R*/ this.moveState.up = 0; break;
+			case 70: /*F*/ this.moveState.down = 0; break;
+
+			case 38: /*up*/ this.moveState.pitchUp = 0; break;
+			case 40: /*down*/ this.moveState.pitchDown = 0; break;
+
+			case 37: /*left*/ this.moveState.yawLeft = 0; break;
+			case 39: /*right*/ this.moveState.yawRight = 0; break;
+
+			case 81: /*Q*/ this.moveState.rollLeft = 0; break;
+			case 69: /*E*/ this.moveState.rollRight = 0; break;
+
+		}
+
+		this.updateMovementVector();
+		this.updateRotationVector();
+/*
+    _state = _prevState;
 
 		window.addEventListener( 'keydown', keydown, false );
-
+*/
 	}
+
+ 	this.updateMovementVector = function() {
+
+		var forward = ( this.moveState.forward || ( this.autoForward && ! this.moveState.back ) ) ? 1 : 0;
+
+		this.moveVector.x = ( - this.moveState.left    + this.moveState.right );
+		this.moveVector.y = ( - this.moveState.down    + this.moveState.up );
+		this.moveVector.z = ( - forward + this.moveState.back );
+
+		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
+
+	};
+
+	this.updateRotationVector = function() {
+
+		this.rotationVector.x = ( - this.moveState.pitchDown + this.moveState.pitchUp );
+		this.rotationVector.y = ( - this.moveState.yawRight  + this.moveState.yawLeft );
+		this.rotationVector.z = ( - this.moveState.rollRight + this.moveState.rollLeft );
+
+		//console.log( 'rotate:', [ this.rotationVector.x, this.rotationVector.y, this.rotationVector.z ] );
+
+	};
+
 
 	function mousedown( event ) {
 
@@ -543,7 +641,17 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	function bind( scope, fn ) {
+
+		return function () {
+
+			fn.apply( scope, arguments );
+
+		};
+
+	}
+
+  this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
 	this.domElement.addEventListener( 'mousedown', mousedown, false );
 
@@ -554,10 +662,12 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
 
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
-	this.domElement.addEventListener( 'keydown', keydown, false );
-	this.domElement.addEventListener( 'keyup', keyup, false );
+	var _keydown = bind( this, this.keydown );
+	var _keyup = bind( this, this.keyup );
+  window.addEventListener( 'keydown', _keydown, false );
+	window.addEventListener( 'keyup', _keyup, false );
+//	this.domElement.addEventListener( 'keydown', keydown, false );
+//	this.domElement.addEventListener( 'keyup', keyup, false );
 
 	this.handleResize();
 

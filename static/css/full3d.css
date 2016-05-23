@@ -71,19 +71,27 @@ body {
 #caption-container {
   background-color: #000;
 }
+
 #info a {
-	color		: #66F;
-	text-decoration	: none;
+	color: #32a6c7;
+	text-decoration: none;
 }
+
 #info a:hover {
-	text-decoration	: underline;
+	text-decoration: underline;
 }
+
 #info .bottom {
-	position	: absolute;
-	bottom		: 0px;
-	right		: 5px;
-	padding		: 5px;
-  text-align: right;
+	position: absolute;
+	bottom: 0px;
+	right: 5px;
+	padding: 5px;
+  text-align: middle;
+  font: 11px Verdana,Arial;
+  color: #777;
+  opacity: 0.6;
+  background: #222;
+  text-decoration: none
 }
 
 #loading {

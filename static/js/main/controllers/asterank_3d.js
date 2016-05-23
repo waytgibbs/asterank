@@ -18,7 +18,9 @@ function Asterank3DCtrl($scope, pubsub) {
         $rs.height($rs.height() + 250);
         $ls.height($ls.height() + 250);
       },
-      top_object_color: 0xffffff
+// WWG:      top_object_color: 0xffffff
+            top_object_color: 0xff0000
+
     });
   }
 
@@ -41,7 +43,7 @@ function Asterank3DCtrl($scope, pubsub) {
   }
 
   $scope.FullView = function() {
-    window.location.href="http://asterank.com/3d";
+    window.location.href="http://wayt.synology.me/3d";
   }
 
   pubsub.subscribe('Lock3DView', function(asteroid) {

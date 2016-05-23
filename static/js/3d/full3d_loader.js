@@ -1,6 +1,6 @@
 ;(function() {
   'use strict';
-
+  var Myrhvold_data = true;
   var asterank3d = new Asterank3D({
     container: document.getElementById('container'),
     not_supported_callback: function() {
@@ -9,6 +9,7 @@
     },
     run_asteroid_query: true,
     show_dat_gui: !isMobileOrTablet(),
+    Myrhvold_data: true,
     static_prefix: window.passthrough_vars.offline_mode ? 'static' : '/static'
   });
 

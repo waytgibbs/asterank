@@ -142,9 +142,9 @@ def _run(partial=False):
         row[key] = val.strip()
       else:
         row[key] = fv
-    row['spec_T'] = row['spec_T'].replace(':', '')
-    row['spec_B'] = row['spec_B'].replace(':', '')
-    row['spec'] = row['spec'].replace(':', '')
+#     row['spec_T'] = row['spec_T'].replace(':', '')
+#     row['spec_B'] = row['spec_B'].replace(':', '')
+#     row['spec'] = row['spec'].replace(':', '')
 
     # match mass
     if row['full_name'] in massd:

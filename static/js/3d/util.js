@@ -27,7 +27,9 @@ function fromJED(jed) {
   return new Date(1000*60*60*24 * (0.5 - 2440588 + jed));
 }
 
-function getColorFromPercent(value, highColor, lowColor) {
+
+//WWG: This function moved into main.js
+/* function getColorFromPercent(value, highColor, lowColor) {
     var r = highColor >> 16;
     var g = highColor >> 8 & 0xFF;
     var b = highColor & 0xFF;
@@ -38,6 +40,9 @@ function getColorFromPercent(value, highColor, lowColor) {
 
     return (r << 16 | g << 8 | b);
 }
+
+ */
+
 
 function displayColorForObject(roid) {
   /*

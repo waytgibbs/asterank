@@ -258,8 +258,8 @@ MATERIALS_INDEX = {
 
 def valuePerKg(type):
   mat_price_per_kg = 0
-  for mat, pct in SPECTRA_INDEX[type].iteritems():
-    mat_price_per_kg += MATERIALS_INDEX[mat]['$_per_kg'] * pct / 100
+#   for mat, pct in SPECTRA_INDEX[type].iteritems():
+#     mat_price_per_kg += MATERIALS_INDEX[mat]['$_per_kg'] * pct / 100
   return mat_price_per_kg
 
 def savedPerKg(type):
@@ -267,8 +267,8 @@ def savedPerKg(type):
   # to the cost of getting the same materials from earth.
   cto = GENERAL_INDEX['cost_to_orbit']
   ret = 0
-  for mat,pct in SPECTRA_INDEX[type].iteritems():
-    ret += cto * pct / 100
+#   for mat,pct in SPECTRA_INDEX[type].iteritems():
+#     ret += cto * pct / 100
   return ret - (cto / 3)  # assume it costs 1/3 as much to mine and get off the asteroid
 
 def profitRatio(baseline_dv, dv):

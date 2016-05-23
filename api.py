@@ -26,7 +26,7 @@ VALID_SORTS = set(['price', 'profit', 'closeness', 'score', UPCOMING_SORT, \
     SMALL_SIZE_SORT])
 
 ORBIT_FIELDS = ['prov_des', 'full_name', 'price', 'profit', 'a', 'e', 'i', \
-    'om', 'ma', 'n', 'w', 'per', 'epoch', 'spec']
+    'om', 'ma', 'n', 'w', 'per', 'epoch', 'spec', 'diameter', 'diameter_sigma', 'M1', 'M2']
 
 # Some database fields were poorly named, so we map better names. Unfortunately
 # the database must stay the same for backwards compatibility.
@@ -53,6 +53,9 @@ def rankings(sort_by, limit, orbits_only=False):
     results = list(asteroids.find({}, fields) \
             .sort(sort_by, direction=pymongo.DESCENDING) \
             .limit(limit))
+#    results = list(asteroids.find({"diameter_sigma": {"$gt": 0}}, fields) \
+#            .sort(sort_by, direction=pymongo.DESCENDING) \
+#            .limit(limit))
   # remove empty fields
   ret = []
   for obj in results:
